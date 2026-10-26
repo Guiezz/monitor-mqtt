@@ -70,7 +70,7 @@ O cenário `demo` segue o relógio e se repete a cada 2 minutos, igual para todo
 | 40–73 | sobe 0,6 °C/s até 210 °C | **temperatura alta** (vermelho) a partir de ~60 s |
 | 73–120 | 210 °C | temperatura alta a cada ciclo |
 
-Encerre um sensor com Ctrl+C e o número de sensores na média cai no ciclo seguinte.
+Encerre um sensor com Ctrl+C e o número de sensores na média cai em até ~15 s (2 a 3 ciclos), quando as últimas leituras dele saem da janela.
 
 ### Por que `--interval 5` e não 60?
 

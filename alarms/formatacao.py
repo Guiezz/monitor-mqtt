@@ -26,7 +26,10 @@ def _decodificar(payload: bytes):
 def _hora(dados) -> str:
     ts = dados.get("ts") if isinstance(dados, dict) else None
     if isinstance(ts, (int, float)) and not isinstance(ts, bool):
-        return time.strftime("%H:%M:%S", time.localtime(ts))
+        try:
+            return time.strftime("%H:%M:%S", time.localtime(ts))
+        except (OverflowError, OSError, ValueError):  # NaN, infinito ou fora da faixa
+            pass
     return time.strftime("%H:%M:%S")
 
 
@@ -38,7 +41,7 @@ def _detalhe_conhecido(tipo: str, dados) -> str | None:
         if tipo == "aumento-repentino":
             return (f"média {dados['media_atual']:.1f} °C "
                     f"(+{dados['diferenca']:.1f} °C desde {dados['media_anterior']:.1f} °C)")
-    except (KeyError, TypeError, ValueError):
+    except (KeyError, TypeError, ValueError, OverflowError):
         return None
     return None
 
@@ -61,5 +64,5 @@ def formatar_media(payload: bytes) -> str | None:
     try:
         n = dados["n_sensores"]
         return f"Média atual: {dados['media']:.1f} °C ({n} {'sensor' if n == 1 else 'sensores'})"
-    except (KeyError, TypeError, ValueError):
+    except (KeyError, TypeError, ValueError, OverflowError):
         return None

@@ -6,6 +6,7 @@ import queue
 import signal
 import sys
 import time
+import uuid
 import tkinter as tk
 from tkinter import ttk
 
@@ -35,6 +36,13 @@ def conectar_com_retry(client, host: str, port: int, espera: float = 2.0, dormir
         except OSError:
             print(f"Broker indisponível em {host}:{port}, tentando de novo em {espera:g} s...")
             dormir(espera)
+
+
+def criar_cliente() -> mqtt.Client:
+    # Id único por processo: com ids iguais o broker derruba uma instância a cada conexão da outra.
+    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id=f"alarms-{uuid.uuid4().hex[:8]}")
+    client.reconnect_delay_set(1, 10)
+    return client
 
 
 def hora() -> str:
@@ -125,20 +133,23 @@ def main(argv=None) -> None:
         entregar("conexao", False)
 
     def on_message(client, userdata, msg):
-        if msg.topic == TOPICO_MEDIA:
-            texto = formatar_media(msg.payload)
-            if texto is not None:
-                entregar("media", texto)
-            return
-        alarme = formatar_evento(msg.topic, msg.payload)
-        print(alarme.linha_console)
-        entregar("evento", alarme)
+        # Uma exceção aqui mataria o thread do paho; vira só um aviso.
+        try:
+            if msg.topic == TOPICO_MEDIA:
+                texto = formatar_media(msg.payload)
+                if texto is not None:
+                    entregar("media", texto)
+                return
+            alarme = formatar_evento(msg.topic, msg.payload)
+            print(alarme.linha_console)
+            entregar("evento", alarme)
+        except Exception as erro:
+            print(f"[{hora()}] Erro ao tratar mensagem de {msg.topic}: {erro!r}")
 
-    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="alarms")
+    client = criar_cliente()
     client.on_connect = on_connect
     client.on_disconnect = on_disconnect
     client.on_message = on_message
-    client.reconnect_delay_set(1, 10)
     try:
         conectar_com_retry(client, args.host, args.port)
         client.loop_start()

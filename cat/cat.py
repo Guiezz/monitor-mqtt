@@ -4,6 +4,7 @@ import argparse
 import os
 import sys
 import time
+import uuid
 
 import paho.mqtt.client as mqtt
 
@@ -35,6 +36,13 @@ def conectar_com_retry(client, host: str, port: int, espera: float = 2.0, dormir
             dormir(espera)
 
 
+def criar_cliente() -> mqtt.Client:
+    # Id único por processo: com ids iguais o broker derruba uma instância a cada conexão da outra.
+    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id=f"cat-{uuid.uuid4().hex[:8]}")
+    client.reconnect_delay_set(1, 10)
+    return client
+
+
 def hora() -> str:
     return time.strftime("%H:%M:%S")
 
@@ -48,17 +56,20 @@ def main(argv=None) -> None:
         client.subscribe(TOPICO_LEITURAS, qos=1)
 
     def on_message(client, userdata, msg):
-        leitura = parse_leitura(msg.payload)
-        if leitura is None:
-            print(f"[{hora()}] Leitura inválida em {msg.topic}: {msg.payload!r}")
-            return
-        janela.adicionar(*leitura, time.time())
+        # Uma exceção aqui mataria o thread do paho; vira só um aviso.
+        try:
+            leitura = parse_leitura(msg.payload)
+            if leitura is None:
+                print(f"[{hora()}] Leitura inválida em {msg.topic}: {msg.payload!r}")
+                return
+            janela.adicionar(*leitura, time.time())
+        except Exception as erro:
+            print(f"[{hora()}] Erro ao tratar mensagem de {msg.topic}: {erro!r}")
 
-    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="cat")
+    client = criar_cliente()
     client.on_connect = on_connect
     client.on_message = on_message
     client.on_disconnect = lambda c, u, f, rc, p: print(f"[{hora()}] desconectado do broker ({rc})")
-    client.reconnect_delay_set(1, 10)
     try:
         conectar_com_retry(client, args.host, args.port)
         client.loop_start()

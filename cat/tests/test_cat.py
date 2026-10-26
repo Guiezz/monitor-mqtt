@@ -5,7 +5,7 @@ import subprocess
 import sys
 import time
 
-from cat import conectar_com_retry, resolver_janela
+from cat import criar_cliente, conectar_com_retry, resolver_janela
 
 
 def test_janela_padrao_e_o_dobro_do_intervalo():
@@ -47,3 +47,8 @@ def test_ctrl_c_sem_broker_sai_sem_traceback():
     saida, _ = p.communicate(timeout=5)
     assert "Broker indisponível" in saida
     assert "Traceback" not in saida and p.returncode == 0
+
+
+def test_duas_instancias_tem_client_id_diferente():
+    # Com o mesmo client id, o broker derruba uma instância a cada conexão da outra.
+    assert criar_cliente()._client_id != criar_cliente()._client_id

@@ -8,7 +8,7 @@ import time
 
 import pytest
 
-from sensor import conectar_com_retry, criar_parser, montar_payload
+from sensor import criar_cliente, conectar_com_retry, criar_parser, montar_payload
 
 
 def test_payload_arredonda_temperatura():
@@ -60,3 +60,8 @@ def test_ctrl_c_sem_broker_sai_sem_traceback():
     saida, _ = p.communicate(timeout=5)
     assert "Broker indisponível" in saida
     assert "Traceback" not in saida and p.returncode == 0
+
+
+def test_duas_instancias_tem_client_id_diferente():
+    # Com o mesmo client id, o broker derruba uma instância a cada conexão da outra.
+    assert criar_cliente()._client_id != criar_cliente()._client_id

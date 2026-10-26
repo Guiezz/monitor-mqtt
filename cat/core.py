@@ -68,9 +68,13 @@ def parse_leitura(payload: bytes) -> tuple[str, float] | None:
         return None
     if isinstance(temperatura, bool) or not isinstance(temperatura, (int, float)):
         return None
+    try:
+        temperatura = float(temperatura)
+    except OverflowError:  # inteiro JSON grande demais para float
+        return None
     if not math.isfinite(temperatura):
         return None
-    return sensor_id, float(temperatura)
+    return sensor_id, temperatura
 
 
 def avaliar(media_atual: float, media_anterior: float | None, agora: float) -> list[dict]:

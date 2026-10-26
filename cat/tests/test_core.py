@@ -41,6 +41,7 @@ def test_parse_leitura_valida():
     b'{"sensor_id": "s1", "temperatura": "187"}', b'{"sensor_id": "s1", "temperatura": true}',
     b'{"sensor_id": "s1", "temperatura": NaN}', b'{"sensor_id": "s1", "temperatura": Infinity}',
     b'{"sensor_id": "", "temperatura": 170}',
+    b'{"sensor_id": "s1", "temperatura": 1' + b"0" * 400 + b'}',   # inteiro grande demais para float
 ])
 def test_parse_leitura_invalida(payload):
     assert parse_leitura(payload) is None

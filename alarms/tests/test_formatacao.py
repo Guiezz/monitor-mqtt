@@ -1,6 +1,8 @@
 import json
 import time
 
+import pytest
+
 from formatacao import CORES, formatar_evento, formatar_media
 
 TS = 1761490985.0
@@ -40,3 +42,16 @@ def test_media():
     assert formatar_media(b'{"media": 187.5, "n_leituras": 6, "n_sensores": 3, "ts": 1}') == "Média atual: 187.5 °C (3 sensores)"
     assert formatar_media(b'{"media": 170.0, "n_leituras": 2, "n_sensores": 1, "ts": 1}') == "Média atual: 170.0 °C (1 sensor)"
     assert formatar_media(b"lixo") is None
+
+
+@pytest.mark.parametrize("payload", [
+    b'{"tipo": "fogo", "ts": NaN}', b'{"tipo": "fogo", "ts": 1e300}', b'{"tipo": "fogo", "ts": -Infinity}',
+    b'{"tipo": "temperatura-alta", "media_atual": 1' + b"0" * 400 + b', "limite": 200, "ts": 1}',
+])
+def test_numeros_extremos_nao_lancam_excecao(payload):
+    a = formatar_evento("caldeira/eventos/temperatura-alta", payload)
+    assert a.tipo.startswith("OUTRO") and len(a.hora) == 8
+
+
+def test_media_com_numero_extremo():
+    assert formatar_media(b'{"media": 1' + b"0" * 400 + b', "n_sensores": 1}') is None
