@@ -120,7 +120,9 @@ Sobre a curva soma-se um ruído uniforme de ±0,5°. A curva é a função pura 
 **Console:** todo alarme também é impresso, por exemplo:
 `[14:03:05] ALARME TEMPERATURA ALTA — média 203.4 °C (limite 200)`
 
-**Código:** `formatacao.py` (puro) monta o texto, o tipo exibido e a cor de cada evento; `alarms.py` cuida de rede, fila e Tkinter.
+**Código:** `formatacao.py` (puro) monta a linha de console de cada evento; `painel.py` (puro) guarda o estado do painel; `alarms.py` cuida de rede, fila e Tkinter.
+
+**Revisão de 2026-10-30 — painel de controle (substitui o layout acima):** tema escuro; média em destaque; gráfico da média dos últimos 3 min com o limite e marcas dos aumentos; um cartão de estado por alarme; histórico com uma linha por ocorrência. As temperaturas altas consecutivas viram uma única ocorrência (pico, duração, ciclos), que termina quando chega uma média ≤ limite. Motivo: a repetição a cada ciclo enterrava os aumentos repentinos. O contrato MQTT e o CAT não mudam.
 
 ## Seção 5 — Testes, erros e vídeo (aprovada)
 

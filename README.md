@@ -19,11 +19,19 @@ Alarms <- caldeira/eventos/aumento-repentino <- CAT
 |---|---|
 | `sensor/` | Publica uma leitura a cada `--interval` s. Cada processo é um sensor; abra mais terminais para ter mais sensores. |
 | `cat/` | Calcula a média de todas as leituras da janela a cada ciclo e publica a média e os eventos. |
-| `alarms/` | Mostra os alarmes numa janela (ou só no console, com `--no-gui`). |
+| `alarms/` | Painel de alarmes numa janela (ou só no console, com `--no-gui`). |
 
 Regras do CAT:
 - **Aumento repentino:** a média atual é pelo menos 5 °C maior que a do ciclo anterior. Só conta subida, porque o evento é de *aumento*.
 - **Temperatura alta:** a média passa de 200 °C. O evento se repete a cada ciclo enquanto a média ficar acima do limite.
+
+### O painel do Alarms
+
+- **Média atual** em destaque, vermelha quando passa do limite.
+- **Gráfico dos últimos 3 minutos**, com o limite de 200 °C tracejado, o trecho acima dele em vermelho e uma marca âmbar em cada aumento repentino.
+- **Um cartão por alarme:** temperatura alta (ativa há quanto tempo, pico, ciclos) e aumento repentino (fica aceso por 30 s depois de cada aumento).
+- **Histórico** com uma linha por ocorrência. O CAT publica temperatura alta a cada ciclo enquanto a média fica acima do limite; o painel junta essas repetições numa linha só, para que os aumentos repentinos não fiquem enterrados.
+- Avisa quando a conexão com o broker cai e quando o CAT para de publicar médias por mais de três ciclos.
 
 Detalhes de projeto em [docs/design.md](docs/design.md).
 

@@ -3,7 +3,7 @@ import time
 
 import pytest
 
-from formatacao import CORES, formatar_evento, formatar_media
+from formatacao import CORES, formatar_evento
 
 TS = 1761490985.0
 HORA = time.strftime("%H:%M:%S", time.localtime(TS))
@@ -38,11 +38,6 @@ def test_payload_malformado_vira_outro():
     assert a.tipo == "OUTRO (temperatura-alta)" and a.cor == CORES["outro"]
 
 
-def test_media():
-    assert formatar_media(b'{"media": 187.5, "n_leituras": 6, "n_sensores": 3, "ts": 1}') == "Média atual: 187.5 °C (3 sensores)"
-    assert formatar_media(b'{"media": 170.0, "n_leituras": 2, "n_sensores": 1, "ts": 1}') == "Média atual: 170.0 °C (1 sensor)"
-    assert formatar_media(b"lixo") is None
-
 
 @pytest.mark.parametrize("payload", [
     b'{"tipo": "fogo", "ts": NaN}', b'{"tipo": "fogo", "ts": 1e300}', b'{"tipo": "fogo", "ts": -Infinity}',
@@ -51,7 +46,3 @@ def test_media():
 def test_numeros_extremos_nao_lancam_excecao(payload):
     a = formatar_evento("caldeira/eventos/temperatura-alta", payload)
     assert a.tipo.startswith("OUTRO") and len(a.hora) == 8
-
-
-def test_media_com_numero_extremo():
-    assert formatar_media(b'{"media": 1' + b"0" * 400 + b', "n_sensores": 1}') is None

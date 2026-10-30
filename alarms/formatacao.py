@@ -58,11 +58,3 @@ def formatar_evento(topico: str, payload: bytes) -> Alarme:
         detalhe = payload.decode("utf-8", errors="replace")[:MAX_DETALHE]
     return Alarme(hora, tipo_exibido, detalhe, cor, f"[{hora}] ALARME {tipo_exibido} — {detalhe}")
 
-
-def formatar_media(payload: bytes) -> str | None:
-    dados = _decodificar(payload)
-    try:
-        n = dados["n_sensores"]
-        return f"Média atual: {dados['media']:.1f} °C ({n} {'sensor' if n == 1 else 'sensores'})"
-    except (KeyError, TypeError, ValueError, OverflowError):
-        return None
