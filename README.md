@@ -4,7 +4,7 @@ Sensores simulados de temperatura de uma caldeira publicam leituras num broker M
 
 ![Demonstração do painel do Alarms: a média sobe, dispara o aumento repentino e depois a temperatura alta](docs/media/demo.gif)
 
-**Vídeo da demonstração:** https://youtu.be/hEwV3xCaTAY (cópia no repositório: [docs/media/demo.mp4](docs/media/demo.mp4))
+**Vídeo da demonstração explicada:** https://youtu.be/hEwV3xCaTAY (cópia no repositório: [docs/media/demo.mp4](docs/media/demo.mp4))
 
 ## Arquitetura
 
