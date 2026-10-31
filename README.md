@@ -2,7 +2,7 @@
 
 Sensores simulados de temperatura de uma caldeira publicam leituras num broker MQTT (Mosquitto). O serviço **CAT** calcula a média das leituras recentes e publica eventos; o serviço **Alarms** mostra esses eventos numa janela Tkinter e no console.
 
-**Vídeo da demonstração:** _(link a adicionar)_
+**Vídeo da demonstração:** https://youtu.be/hEwV3xCaTAY
 
 ## Arquitetura
 
