@@ -2,4 +2,5 @@
 __pycache__/
 .pytest_cache/
 .superpowers/
-*.mp4
+/*.mp4
+/*.mov
